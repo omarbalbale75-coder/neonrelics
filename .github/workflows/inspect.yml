@@ -11,17 +11,14 @@ jobs:
         with:
           java-version: '25'
           distribution: 'microsoft'
-      - run: chmod +x ./gradlew && ./gradlew genSources --no-configuration-cache -q || true
+      - run: chmod +x ./gradlew && ./gradlew build --no-configuration-cache -q || true
       - name: dump
         run: |
-          mkdir -p /tmp/src
-          for JAR in $(find ~/.gradle .gradle -name "*minecraft*sources*.jar" 2>/dev/null); do echo "JAR=$JAR"; (cd /tmp/src && unzip -q -o "$JAR"); done
-          cd /tmp/src
-          for f in $(find . -name Villager.java -o -name AbstractVillager.java -o -name MerchantOffer.java -o -name MerchantMenu.java -o -name MerchantResultSlot.java); do
-            echo "=================== $f"; cat -n "$f" | grep -nE "SpecialPrice|startTrading|stopTrading|mobInteract|openTradingScreen|getCostA|notifyTrade|resetSpecial|updateSpecial|Discount|priceMultiplier|getModifiedCostCount|class |sendMerchantOffers" 
+          find "$HOME/.gradle" "$PWD/.gradle" -name "*minecraft*.jar" 2>/dev/null | grep -v sources
+          for JAR in $(find "$HOME/.gradle" "$PWD/.gradle" -name "*minecraft*.jar" 2>/dev/null | grep -v sources); do
+            for C in $(unzip -l "$JAR" | grep -oE "net/minecraft/[A-Za-z/]*/(Villager|AbstractVillager|MerchantOffer)\.class"); do
+              CN=$(echo "${C%.class}" | tr / .)
+              echo "########## $CN in $JAR"
+              javap -p -c -cp "$JAR" "$CN" | awk '/(startTrading|updateSpecialPrices|stopTrading|resetSpecialPrices|mobInteract|getCostA|getModifiedCostCount|addToSpecialPriceDiff|setTradingPlayer|openTradingScreen)\(/{p=1} p&&/invoke|getfield|putfield|\(|Code:/{print} p&&/^$/{p=0;print "-----"}'
+            done
           done
-          echo "=================== Villager full startTrading/updateSpecialPrices bodies"
-          V=$(find . -name Villager.java | head -1)
-          awk '/void startTrading|void updateSpecialPrices|void stopTrading|void resetSpecialPrices|InteractionResult mobInteract/{p=1;n=0} p{print; if(/\{/)n+=gsub(/\{/,"{"); if(/\}/)n-=gsub(/\}/,"}"); if(n<=0 && /\}/){p=0;print "-----"}}' "$V"
-          M=$(find . -name MerchantOffer.java | head -1)
-          awk '/getCostA\(\)|getModifiedCostCount|addToSpecialPriceDiff|resetSpecialPriceDiff/{p=1;n=0} p{print; if(/\{/)n+=gsub(/\{/,"{"); if(/\}/)n-=gsub(/\}/,"}"); if(n<=0 && /\}/){p=0;print "-----"}}' "$M"
