@@ -1,11 +1,9 @@
 {
   "key.neonrelics.ability": "Use Relic Ability",
   "key.category.neonrelics.relics": "Neon Relics",
-
   "effect.neonrelics.cyber_maniac": "Cyber Maniac",
   "effect.neonrelics.overclock": "Overclock",
   "effect.neonrelics.stunned": "Stunned",
-
   "death.attack.neonrelics.true_damage": "%1$s was torn apart",
   "death.attack.neonrelics.true_damage.player": "%1$s was torn apart by %2$s",
   "death.attack.neonrelics.true_damage.item": "%1$s was torn apart by %2$s using %3$s",
@@ -14,5 +12,7 @@
   "death.attack.neonrelics.hellfire.item": "%1$s was consumed by %2$s's hellfire",
   "death.attack.neonrelics.burnout": "%1$s went Cyber Maniac and burned out",
   "death.attack.neonrelics.burnout.player": "%1$s went Cyber Maniac and burned out",
-  "death.attack.neonrelics.burnout.item": "%1$s went Cyber Maniac and burned out"
+  "death.attack.neonrelics.burnout.item": "%1$s went Cyber Maniac and burned out",
+  "item.neonrelics.relic_reroll": "Relic Reroll Tome",
+  "item.neonrelics.chrome_shotgun": "Chrome Breaker"
 }

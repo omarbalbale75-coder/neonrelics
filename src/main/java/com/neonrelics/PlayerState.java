@@ -43,8 +43,13 @@ public final class PlayerState {
 
 	// Beast
 	public boolean clawReady;
-	public boolean lungeReady;
+	public boolean teleportReady;
 	public long primedTick = -1L;
+	public int axeHits;
+	public long lastAxeHit = -1000L;
+
+	// Chrome Body shotgun
+	public long shotgunReadyAt;
 
 	// Prosperity
 	public boolean heroSeen;
@@ -60,7 +65,8 @@ public final class PlayerState {
 		this.takenStreak = 0;
 		this.takenFrom.clear();
 		this.clawReady = false;
-		this.lungeReady = false;
+		this.teleportReady = false;
+		this.axeHits = 0;
 		this.slowedProjectiles.clear();
 		this.strainWarning = 0;
 	}

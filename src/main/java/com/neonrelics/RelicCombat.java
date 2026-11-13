@@ -61,6 +61,10 @@ public final class RelicCombat {
 		return !stack.isEmpty() && itemPath(stack).endsWith("_spear");
 	}
 
+	public static boolean isAxe(ItemStack stack) {
+		return !stack.isEmpty() && itemPath(stack).endsWith("_axe");
+	}
+
 	public static boolean isSword(ItemStack stack) {
 		return !stack.isEmpty() && itemPath(stack).endsWith("_sword");
 	}
@@ -226,7 +230,7 @@ public final class RelicCombat {
 			return;
 		}
 
-		// The hit AFTER a spear hit becomes a claw strike.
+		// The hit after the charge completes becomes a claw strike.
 		if (state.clawReady && state.primedTick < now) {
 			state.clawReady = false;
 			ModDamage.trueDamage(level, victim, attacker, Tuning.BEAST_CLAW_TRUE_DAMAGE);
@@ -235,11 +239,24 @@ public final class RelicCombat {
 			Fx.sound(level, victim, SoundEvents.PLAYER_ATTACK_CRIT, 1.0F, 0.6F);
 		}
 
-		if (isSpear(attacker.getMainHandItem())) {
-			state.clawReady = true;
-			state.lungeReady = true;
-			state.primedTick = now;
-			Fx.actionBar(attacker, Component.literal("Claw primed - next spear lunge is empowered").withStyle(ChatFormatting.RED));
+		if (isAxe(attacker.getMainHandItem())) {
+			if (now - state.lastAxeHit > Tuning.BEAST_AXE_WINDOW) {
+				state.axeHits = 0;
+			}
+
+			state.lastAxeHit = now;
+			state.axeHits++;
+
+			if (state.axeHits >= Tuning.BEAST_AXE_HITS) {
+				state.axeHits = 0;
+				state.clawReady = true;
+				state.teleportReady = true;
+				state.primedTick = now;
+				Fx.sound(level, attacker, SoundEvents.RAVAGER_ROAR, 0.5F, 1.8F);
+				Fx.actionBar(attacker, Component.literal("CLAW + TELEPORT READY - next hit claws, right-click the axe to teleport").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+			} else {
+				Fx.actionBar(attacker, Component.literal("Beast charge " + state.axeHits + "/" + Tuning.BEAST_AXE_HITS).withStyle(ChatFormatting.RED));
+			}
 		}
 	}
 

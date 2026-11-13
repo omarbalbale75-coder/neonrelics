@@ -27,16 +27,17 @@ public enum Relic {
 					"Mastery: summon 3 storms and kill a player in each (cooldown 20 min).")),
 	BEAST("beast", "Beast", 0xFF3030, ChatFormatting.RED, "Savage Bite", Tuning.BEAST_COOLDOWN, 0,
 			List.of(
-					"Passive: after a spear hit your next hit is a Claw (3.5 true damage)",
-					"and your next spear lunge either leaps straight at the enemy you're",
-					"looking at, or dashes you 6 blocks forward.",
+					"Passive: every 3 axe hits, your next hit is a Claw (3.5 true damage)",
+					"and right-clicking the axe teleports you straight to the enemy you're",
+					"looking at - or 6 blocks forward if you're looking at nothing.",
 					"Ability: a bite that stuns and deals 6 true damage (3 min cooldown).")),
 	CYBER("cyber", "Cyber", 0x3CF6FF, ChatFormatting.DARK_AQUA, "Implant", Tuning.BOOT_COOLDOWN, 0,
 			List.of(
 					"Passive: hit someone 3 times in a row -> they get Slowness III.",
 					"Get hit 3 times in a row -> attackers get Slowness V + Mining",
 					"Fatigue V and you get Speed III (1 min cooldown).",
-					"Your AI, NOVA, sells you a Boot Accelerator or a Chrome Body.")),
+					"Your AI, NOVA, sells you a Boot Accelerator or a Chrome Body",
+					"(Chrome Body comes with a true-damage shotgun).")),
 	BLOODLUSTED("bloodlusted", "Bloodlusted", 0xE0102A, ChatFormatting.DARK_RED, "Blood Frenzy", Tuning.BLOOD_COOLDOWN, 0,
 			List.of(
 					"Passive: every kill grants Strength IV for 30 seconds.",

@@ -37,15 +37,19 @@ If you push this folder to GitHub, the included workflow (`.github/workflows/bui
 
 **Weather.** In rain, tridents deal +20% and count as Sharpness III. In thunderstorms they deal +35%, count as Sharpness V, and strike Channeling lightning on every hit, thrown or melee. The lightning only hits the target, not you. Ability: set the weather to clear, rain or thunder for 5 minutes (30 min cooldown). Mastery: summon 3 thunderstorms and kill at least one player during each; the cooldown then drops to 20 minutes.
 
-**Beast.** After a spear hit, your next hit is a Claw (+3.5 true damage). Your next spear swing or right-click becomes an empowered lunge. If you're looking at an enemy within 24 blocks, you leap straight to it. If you're not, you dash 6 blocks forward. Ability: Bite (3 min cooldown), dealing 6 true damage and stunning the target for 2s. No mastery.
+**Beast.** Every 3 axe hits charges you up. Your next hit is a Claw (+3.5 true damage), and right-clicking the axe teleports you. If you're looking at an enemy within 24 blocks, you teleport straight to it; otherwise you teleport 6 blocks forward. Ability: Bite (3 min cooldown), dealing 6 true damage and stunning the target for 2s. No mastery.
 
 **Cyber.** Hit the same target 3 times in a row and it gets Slowness III for 3s. Get hit 3 times in a row and your attackers get Slowness V and Mining Fatigue V for 5s, while you get Speed III for 5s. These share a 1 min cooldown. Your AI, **NOVA**, sells one permanent implant for 10 diamonds:
 - **Boot Accelerator.** Ability: Overdrive. For 8s, everything within 20 blocks is slowed and projectiles freeze, while you get Speed III and leave neon afterimages (20s cooldown). Each use adds 30% to the Neural Load bar on the right of your screen, and it drains slowly. At 100% you go **Cyber Maniac**: heavily buffed for 3 minutes, then you die.
-- **Chrome Body.** No ability. You get permanent Resistance II, double mace damage, no fall damage, and permanent Cyber Maniac at level II (200%). You die after 1 hour unless you keep killing; any player or hostile-mob kill resets the clock.
+- **Chrome Body.** No ability. You get permanent Resistance II, double mace damage, no fall damage, and permanent Cyber Maniac at level II (200%). You die after 1 hour unless you keep killing; any player or hostile-mob kill resets the clock. You also always carry the **Chrome Breaker** shotgun: right-click to blast everything in a cone in front of you (12 blocks) for 3 true damage. It has Curse of Vanishing, and you get a new one whenever you don't have one, including after respawning. Nobody else can use it.
 
 **Bloodlusted.** Every kill gives Strength IV for 30s. Swords deal 1.5x damage. Ability: Strength IV and Speed III for 1 minute (3 min cooldown).
 
 **Haste.** Permanent Speed II and Haste III. Ability: Overclock for 20s, with 2x attack speed, 1.25x damage and Speed III (3 min cooldown).
+
+## Items & recipes
+- **Relic Reroll Tome:** right-click to swap your relic for a different random one. Every other relic has equal odds. It wipes mastery and implants. Recipe: totem of undying in the corners, netherite ingots on the edges, a beacon in the center.
+- **Cobwebs:** 2 string placed diagonally makes 2 cobwebs.
 
 ## Tweaking
 Every number (cooldowns, durations, damage, implant price, chances) is in `src/main/java/com/neonrelics/Tuning.java`.

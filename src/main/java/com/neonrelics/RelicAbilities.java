@@ -7,6 +7,7 @@ import org.jspecify.annotations.Nullable;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -16,14 +17,18 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+
+import com.neonrelics.item.ModItems;
 
 /**
  * Everything that happens when the ability key (default B) is pressed.
@@ -282,12 +287,13 @@ public final class RelicAbilities {
 		return true;
 	}
 
-	/** Beast passive: the empowered lunge after a spear hit. */
-	public static void beastLunge(ServerPlayer player, PlayerState state) {
-		state.lungeReady = false;
+	/** Beast passive: after 3 axe hits, right-click the axe to teleport. */
+	public static void beastTeleport(ServerPlayer player, PlayerState state) {
+		state.teleportReady = false;
 		ServerLevel level = (ServerLevel) player.level();
 		Vec3 start = player.position();
-		LivingEntity target = lookTarget(player, Tuning.BEAST_LUNGE_TARGET_RANGE);
+		Fx.particles(level, ParticleTypes.REVERSE_PORTAL, player, 40, 0.4, 0.1);
+		LivingEntity target = lookTarget(player, Tuning.BEAST_TELEPORT_TARGET_RANGE);
 
 		if (target != null) {
 			// Leap straight at the enemy and land right in front of it.
@@ -306,14 +312,14 @@ public final class RelicAbilities {
 			float pitch = (float) -(Math.atan2(look.y, Math.sqrt(look.x * look.x + look.z * look.z)) * 180.0 / Math.PI);
 			trail(level, start, dest);
 			teleport(player, dest, yaw, pitch);
-			Fx.actionBar(player, Component.literal("POUNCE").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+			Fx.actionBar(player, Component.literal("TELEPORT STRIKE").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
 		} else {
-			// Nothing to hunt - extended 6 block dash (escape / travel).
+			// Nothing to hunt - blink 6 blocks forward (escape / travel).
 			Vec3 look = player.getLookAngle();
 			Vec3 dir = new Vec3(look.x, Math.max(-0.3, Math.min(0.6, look.y)), look.z).normalize();
 			Vec3 dest = start;
 
-			for (double d = Tuning.BEAST_LUNGE_DASH; d > 0.4; d -= 0.5) {
+			for (double d = Tuning.BEAST_TELEPORT_DISTANCE; d > 0.4; d -= 0.5) {
 				Vec3 candidate = start.add(dir.scale(d));
 
 				if (level.noCollision(player, player.getBoundingBox().move(candidate.subtract(start)))
@@ -329,12 +335,11 @@ public final class RelicAbilities {
 
 			trail(level, start, dest);
 			teleport(player, dest, player.getYRot(), player.getXRot());
-			player.setDeltaMovement(dir.scale(0.5));
-			player.syncVelocity = true;
-			Fx.actionBar(player, Component.literal("LUNGE +6").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+			Fx.actionBar(player, Component.literal("TELEPORT +6").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
 		}
 
-		Fx.sound(level, player, SoundEvents.RAVAGER_ATTACK, 0.8F, 1.4F);
+		Fx.particles(level, ParticleTypes.PORTAL, player, 60, 0.4, 0.6);
+		Fx.sound(level, player, SoundEvents.ENDERMAN_TELEPORT, 1.0F, 0.8F);
 	}
 
 	private static boolean clearPath(ServerPlayer player, Vec3 from, Vec3 to) {
@@ -477,7 +482,9 @@ public final class RelicAbilities {
 		if (data.hasChrome()) {
 			Fx.keepPermanent(player, MobEffects.RESISTANCE, 1);
 			startManiac(player, data, now, Tuning.CHROME_TIMER);
+			shotgunUpkeep(player, data);
 			Nova.say(player, "Chrome Body online. Resistance II, double mace damage, zero fall damage.");
+			Nova.say(player, "Shotgun linked to your chrome. Lose it and I'll print you another.");
 			Nova.warn(player, "You now run permanently at 200% Cyber Maniac. You burn out in 1 hour - every kill resets the clock.");
 		} else {
 			Nova.say(player, "Boot Accelerator installed. Press your ability key to overdrive - the world slows, you don't.");
@@ -524,6 +531,119 @@ public final class RelicAbilities {
 
 			for (double y = 0.2; y < player.getBbHeight(); y += 0.4) {
 				level.sendParticles(Fx.dust(color, 1.3F), player.xo, player.yo + y, player.zo, 2, 0.12, 0.08, 0.12, 0.0);
+			}
+		}
+	}
+
+	// ------------------------------------------------------------------
+	// Chrome Body shotgun
+	// ------------------------------------------------------------------
+
+	public static void fireShotgun(ServerPlayer player) {
+		RelicData data = NeonRelics.data(player);
+		ServerLevel level = (ServerLevel) player.level();
+
+		if (!data.hasChrome()) {
+			Fx.actionBar(player, Component.literal("The grip won't lock to flesh. Chrome Body only.").withStyle(ChatFormatting.GRAY));
+			return;
+		}
+
+		PlayerState state = PlayerState.of(player.getUUID());
+		long now = NeonRelics.now(level.getServer());
+
+		if (now < state.shotgunReadyAt) {
+			return;
+		}
+
+		state.shotgunReadyAt = now + Tuning.SHOTGUN_COOLDOWN;
+		Vec3 eye = player.getEyePosition();
+		Vec3 look = player.getLookAngle();
+		double minDot = Math.cos(Math.toRadians(Tuning.SHOTGUN_CONE));
+		AABB area = player.getBoundingBox().inflate(Tuning.SHOTGUN_RANGE);
+
+		for (Entity entity : level.getEntities(player, area, e -> validTarget(player, e))) {
+			Vec3 center = entity.getBoundingBox().getCenter();
+			Vec3 toTarget = center.subtract(eye);
+			double distance = toTarget.length();
+
+			if (distance > Tuning.SHOTGUN_RANGE || distance < 1.0E-3 || toTarget.normalize().dot(look) < minDot) {
+				continue;
+			}
+
+			BlockHitResult wall = level.clip(new ClipContext(eye, center, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
+
+			if (wall.getType() != HitResult.Type.MISS) {
+				continue;
+			}
+
+			LivingEntity target = (LivingEntity) entity;
+			ModDamage.trueDamage(level, target, player, Tuning.SHOTGUN_TRUE_DAMAGE);
+			target.setDeltaMovement(target.getDeltaMovement().add(look.x * 0.9, 0.25, look.z * 0.9));
+			target.syncVelocity = true;
+			Fx.particles(level, ParticleTypes.CRIT, target, 12, 0.3, 0.2);
+		}
+
+		// Pellet trails
+		var random = player.getRandom();
+
+		for (int i = 0; i < 9; i++) {
+			Vec3 dir = look.add((random.nextDouble() - 0.5) * 0.35, (random.nextDouble() - 0.5) * 0.35, (random.nextDouble() - 0.5) * 0.35).normalize();
+
+			for (double d = 1.0; d < Tuning.SHOTGUN_RANGE; d += 0.8) {
+				Vec3 p = eye.add(dir.scale(d));
+				level.sendParticles(ParticleTypes.CRIT, p.x, p.y, p.z, 1, 0.0, 0.0, 0.0, 0.0);
+			}
+		}
+
+		// Muzzle blast
+		Vec3 muzzle = eye.add(look.scale(1.2)).add(0.0, -0.2, 0.0);
+		level.sendParticles(ParticleTypes.LARGE_SMOKE, muzzle.x, muzzle.y, muzzle.z, 6, 0.1, 0.1, 0.1, 0.02);
+		level.sendParticles(ParticleTypes.FLAME, muzzle.x, muzzle.y, muzzle.z, 10, 0.15, 0.15, 0.15, 0.05);
+		level.sendParticles(Fx.dust(0xFF2244, 1.5F), muzzle.x, muzzle.y, muzzle.z, 10, 0.2, 0.2, 0.2, 0.0);
+		Fx.sound(level, player, SoundEvents.GENERIC_EXPLODE, 0.7F, 1.8F);
+		Fx.sound(level, player, SoundEvents.FIREWORK_ROCKET_BLAST, 1.0F, 0.6F);
+
+		// Recoil
+		player.setDeltaMovement(player.getDeltaMovement().subtract(look.scale(0.35)));
+		player.syncVelocity = true;
+	}
+
+	/**
+	 * Chrome Body always carries exactly one shotgun (with Curse of Vanishing, so it never drops on death).
+	 * Anyone else who ends up holding one loses it.
+	 */
+	public static void shotgunUpkeep(ServerPlayer player, RelicData data) {
+		Inventory inventory = player.getInventory();
+		boolean chrome = data.hasChrome();
+		int found = 0;
+
+		for (int i = 0; i < inventory.getContainerSize(); i++) {
+			if (inventory.getItem(i).is(ModItems.CHROME_SHOTGUN)) {
+				if (chrome) {
+					found++;
+				} else {
+					inventory.setItem(i, ItemStack.EMPTY);
+				}
+			}
+		}
+
+		boolean carried = player.containerMenu.getCarried().is(ModItems.CHROME_SHOTGUN);
+
+		if (!chrome) {
+			if (carried) {
+				player.containerMenu.setCarried(ItemStack.EMPTY);
+			}
+
+			return;
+		}
+
+		if (found == 0 && !carried) {
+			ServerLevel level = (ServerLevel) player.level();
+			ItemStack gun = new ItemStack(ModItems.CHROME_SHOTGUN);
+			gun.enchant(level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.VANISHING_CURSE), 1);
+
+			if (!inventory.add(gun)) {
+				level.addFreshEntity(new ItemEntity(level, player.getX(), player.getY() + 0.5, player.getZ(), gun));
 			}
 		}
 	}

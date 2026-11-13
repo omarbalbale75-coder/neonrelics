@@ -161,6 +161,10 @@ public final class RelicEvents {
 			state.pendingRewards.clear();
 		}
 
+		if (now % 20 == 0 && player.isAlive()) {
+			RelicAbilities.shotgunUpkeep(player, data);
+		}
+
 		if (relic == null || !player.isAlive()) {
 			return;
 		}
@@ -339,33 +343,16 @@ public final class RelicEvents {
 	}
 
 	// ------------------------------------------------------------------
-	// Beast: a fresh spear swing (left click) after a spear hit = the empowered lunge
-	// ------------------------------------------------------------------
-
-	/** Called by ServerGamePacketListenerImplMixin when the player swings (left-clicks). */
-	public static void onPunch(ServerPlayer player) {
-		if (!NeonRelics.data(player).is(Relic.BEAST) || !RelicCombat.isSpear(player.getMainHandItem())) {
-			return;
-		}
-
-		PlayerState state = PlayerState.of(player.getUUID());
-
-		if (state.lungeReady && NeonRelics.now(player.level().getServer()) > state.primedTick) {
-			RelicAbilities.beastLunge(player, state);
-		}
-	}
-
-	// ------------------------------------------------------------------
-	// Beast: right-clicking a spear also triggers the empowered lunge
+	// Beast: right-clicking an axe after 3 axe hits = teleport
 	// ------------------------------------------------------------------
 
 	public static InteractionResult onUseItem(Player player, Level level, InteractionHand hand) {
 		if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer && NeonRelics.data(serverPlayer).is(Relic.BEAST)) {
 			PlayerState state = PlayerState.of(serverPlayer.getUUID());
 
-			if (state.lungeReady && RelicCombat.isSpear(serverPlayer.getItemInHand(hand))
+			if (state.teleportReady && RelicCombat.isAxe(serverPlayer.getItemInHand(hand))
 					&& NeonRelics.now(serverPlayer.level().getServer()) > state.primedTick) {
-				RelicAbilities.beastLunge(serverPlayer, state);
+				RelicAbilities.beastTeleport(serverPlayer, state);
 			}
 		}
 

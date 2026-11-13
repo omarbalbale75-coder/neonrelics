@@ -19,6 +19,7 @@ import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
+import com.neonrelics.item.ModItems;
 import com.neonrelics.network.AbilityPayload;
 import com.neonrelics.network.HudPayload;
 
@@ -47,6 +48,7 @@ public class NeonRelics implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		RelicEffects.init();
+		ModItems.init();
 
 		PayloadTypeRegistry.serverboundPlay().register(AbilityPayload.TYPE, AbilityPayload.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(HudPayload.TYPE, HudPayload.CODEC);

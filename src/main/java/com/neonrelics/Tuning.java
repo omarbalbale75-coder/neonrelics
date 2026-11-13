@@ -47,8 +47,12 @@ public final class Tuning {
 	public static final int BEAST_BITE_STUN = 2 * SECOND;
 	public static final double BEAST_BITE_REACH = 4.5;
 	public static final int BEAST_COOLDOWN = 3 * MINUTE;
-	public static final double BEAST_LUNGE_TARGET_RANGE = 24.0;
-	public static final double BEAST_LUNGE_DASH = 6.0;
+	/** Axe hits needed to charge the Claw + Teleport. */
+	public static final int BEAST_AXE_HITS = 3;
+	/** Max gap between axe hits before the charge resets. */
+	public static final int BEAST_AXE_WINDOW = 5 * SECOND;
+	public static final double BEAST_TELEPORT_TARGET_RANGE = 24.0;
+	public static final double BEAST_TELEPORT_DISTANCE = 6.0;
 
 	// ---------- Cyber ----------
 	public static final int CYBER_STREAK_HITS = 3;
@@ -66,6 +70,12 @@ public final class Tuning {
 	public static final int BOOT_MANIAC_DURATION = 3 * MINUTE;
 	// Chrome Body
 	public static final int CHROME_TIMER = 60 * MINUTE;
+	// Chrome Body shotgun
+	public static final float SHOTGUN_TRUE_DAMAGE = 3.0F;
+	public static final double SHOTGUN_RANGE = 12.0;
+	/** Half-angle of the blast cone in degrees. */
+	public static final double SHOTGUN_CONE = 22.0;
+	public static final int SHOTGUN_COOLDOWN = 25; // ticks
 
 	// ---------- Bloodlusted ----------
 	public static final int BLOOD_KILL_STRENGTH = 30 * SECOND;

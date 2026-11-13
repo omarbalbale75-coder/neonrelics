@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "T": "minecraft:totem_of_undying",
+    "N": "minecraft:netherite_ingot",
+    "B": "minecraft:beacon"
+  },
+  "pattern": [
+    "TNT",
+    "NBN",
+    "TNT"
+  ],
+  "result": {
+    "count": 1,
+    "id": "neonrelics:relic_reroll"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "neonrelics:item/chrome_shotgun"
+  }
+}
