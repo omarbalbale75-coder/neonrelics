@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "neonrelics:true_damage",
-    "neonrelics:burnout"
+    "neonrelics:burnout",
+    "neonrelics:chrome_crush"
   ]
 }

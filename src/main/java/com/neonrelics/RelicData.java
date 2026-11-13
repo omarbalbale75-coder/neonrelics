@@ -24,7 +24,8 @@ public final class RelicData {
 			Codec.LONG.optionalFieldOf("active_until", 0L).forGetter(d -> d.activeUntil),
 			Codec.BOOL.optionalFieldOf("storm_active", false).forGetter(d -> d.stormActive),
 			Codec.BOOL.optionalFieldOf("storm_kill", false).forGetter(d -> d.stormKill),
-			Codec.LONG.optionalFieldOf("passive_until", 0L).forGetter(d -> d.passiveUntil)
+			Codec.LONG.optionalFieldOf("passive_until", 0L).forGetter(d -> d.passiveUntil),
+			Codec.LONG.optionalFieldOf("slam_until", 0L).forGetter(d -> d.slamUntil)
 	).apply(instance, RelicData::new));
 
 	/** Relic id, or "" if the player has not been given one yet. */
@@ -46,13 +47,15 @@ public final class RelicData {
 	public boolean stormKill;
 	/** Cyber passive cooldown. */
 	public long passiveUntil;
+	/** Chrome Body: slams are disabled until this time (after a 12+ block execution). */
+	public long slamUntil;
 
 	public RelicData() {
-		this("", 0L, false, 0, "", 0.0F, 0L, 0L, false, false, 0L);
+		this("", 0L, false, 0, "", 0.0F, 0L, 0L, false, false, 0L, 0L);
 	}
 
 	public RelicData(String relic, long cooldownUntil, boolean mastered, int mastery, String implant, float strain,
-			long maniacUntil, long activeUntil, boolean stormActive, boolean stormKill, long passiveUntil) {
+			long maniacUntil, long activeUntil, boolean stormActive, boolean stormKill, long passiveUntil, long slamUntil) {
 		this.relic = relic;
 		this.cooldownUntil = cooldownUntil;
 		this.mastered = mastered;
@@ -64,6 +67,7 @@ public final class RelicData {
 		this.stormActive = stormActive;
 		this.stormKill = stormKill;
 		this.passiveUntil = passiveUntil;
+		this.slamUntil = slamUntil;
 	}
 
 	@Nullable
@@ -96,5 +100,6 @@ public final class RelicData {
 		this.stormActive = false;
 		this.stormKill = false;
 		this.passiveUntil = 0L;
+		this.slamUntil = 0L;
 	}
 }

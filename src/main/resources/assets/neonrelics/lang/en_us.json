@@ -14,5 +14,8 @@
   "death.attack.neonrelics.burnout.player": "%1$s went Cyber Maniac and burned out",
   "death.attack.neonrelics.burnout.item": "%1$s went Cyber Maniac and burned out",
   "item.neonrelics.relic_reroll": "Relic Reroll Tome",
-  "item.neonrelics.chrome_shotgun": "Chrome Breaker"
+  "item.neonrelics.chrome_shotgun": "Chrome Breaker",
+  "death.attack.neonrelics.chrome_crush": "%1$s was crushed flat",
+  "death.attack.neonrelics.chrome_crush.player": "%1$s was crushed flat by %2$s's chrome",
+  "death.attack.neonrelics.chrome_crush.item": "%1$s was crushed flat by %2$s's chrome"
 }

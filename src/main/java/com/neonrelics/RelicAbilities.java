@@ -640,6 +640,41 @@ public final class RelicAbilities {
 
 	private static void groundSlam(ServerPlayer player, double drop) {
 		ServerLevel level = (ServerLevel) player.level();
+		RelicData data = NeonRelics.data(player);
+		long now = NeonRelics.now(level.getServer());
+
+		if (now < data.slamUntil) {
+			Fx.actionBar(player, Component.literal("Slam offline: " + Fx.time(data.slamUntil - now)).withStyle(ChatFormatting.DARK_PURPLE));
+			return;
+		}
+
+		// 12+ blocks straight onto someone's head = guaranteed kill, then slams shut down for 5 minutes.
+		if (drop >= Tuning.SLAM_EXECUTE_FALL) {
+			int crushed = 0;
+
+			for (Entity entity : level.getEntities(player, player.getBoundingBox().inflate(1.0, 2.0, 1.0), e -> validTarget(player, e))) {
+				if (entity instanceof net.minecraft.world.entity.player.Player victim && victim.isCreative()) {
+					continue;
+				}
+
+				double dx = entity.getX() - player.getX();
+				double dz = entity.getZ() - player.getZ();
+				double reach = (entity.getBbWidth() + player.getBbWidth()) / 2.0;
+
+				if (dx * dx + dz * dz <= reach * reach) {
+					entity.hurtServer(level, ModDamage.source(level, ModDamage.CRUSH, player), Float.MAX_VALUE);
+					Fx.particles(level, Fx.dust(0xFF1A3C, 2.0F), entity, 40, 0.4, 0.0);
+					crushed++;
+				}
+			}
+
+			if (crushed > 0) {
+				data.slamUntil = now + Tuning.SLAM_EXECUTE_COOLDOWN;
+				Fx.sound(level, player, SoundEvents.ANVIL_LAND, 1.0F, 0.5F);
+				Fx.title(player, Component.literal("CRUSHED").withStyle(ChatFormatting.RED, ChatFormatting.BOLD),
+						Component.literal("Slams offline for " + Fx.time(Tuning.SLAM_EXECUTE_COOLDOWN)).withStyle(ChatFormatting.GRAY));
+			}
+		}
 		float damage = Tuning.SLAM_BASE_DAMAGE + Tuning.SLAM_DAMAGE_PER_BLOCK * (float) (drop - Tuning.SLAM_MIN_FALL);
 		double radius = Tuning.SLAM_RADIUS;
 		AABB area = player.getBoundingBox().inflate(radius, 2.0, radius);

@@ -23,6 +23,8 @@ public final class ModDamage {
 	public static final ResourceKey<DamageType> HELLFIRE = key("hellfire");
 	/** Cyber Maniac running out. Cannot be blocked by anything, including totems. */
 	public static final ResourceKey<DamageType> BURNOUT = key("burnout");
+	/** Chrome Body landing on someone from 12+ blocks. Nothing saves you, not even a totem. */
+	public static final ResourceKey<DamageType> CRUSH = key("chrome_crush");
 
 	private static ResourceKey<DamageType> key(String path) {
 		return ResourceKey.create(Registries.DAMAGE_TYPE, NeonRelics.id(path));
@@ -37,7 +39,7 @@ public final class ModDamage {
 	}
 
 	public static boolean isOurs(DamageSource source) {
-		return source.is(TRUE_DAMAGE) || source.is(HELLFIRE) || source.is(BURNOUT);
+		return source.is(TRUE_DAMAGE) || source.is(HELLFIRE) || source.is(BURNOUT) || source.is(CRUSH);
 	}
 
 	public static void trueDamage(ServerLevel level, LivingEntity target, @Nullable Entity attacker, float amount) {

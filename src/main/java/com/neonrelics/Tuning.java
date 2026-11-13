@@ -77,6 +77,10 @@ public final class Tuning {
 	public static final float SLAM_BASE_DAMAGE = 5.0F;   // at 5 blocks
 	public static final float SLAM_DAMAGE_PER_BLOCK = 1.5F;
 	public static final double SLAM_RADIUS = 4.0;
+	/** Landing directly on someone from this high kills them outright... */
+	public static final double SLAM_EXECUTE_FALL = 12.0;
+	/** ...and then every slam is disabled for this long. */
+	public static final int SLAM_EXECUTE_COOLDOWN = 5 * MINUTE;
 	// Chrome Body shotgun
 	public static final float SHOTGUN_TRUE_DAMAGE = 3.0F;
 	public static final double SHOTGUN_RANGE = 12.0;
