@@ -49,6 +49,9 @@ public final class RelicCombat {
 
 	private record Slash(UUID attacker, long tick) { }
 
+	/** Players recently hurt by a Chrome Body: victim -> (chrome player -> last hit time). */
+	private static final Map<UUID, Map<UUID, Long>> CHROME_HITS = new HashMap<>();
+
 	// ------------------------------------------------------------------
 	// Item helpers
 	// ------------------------------------------------------------------
@@ -174,12 +177,22 @@ public final class RelicCombat {
 	}
 
 	public static void afterDamage(LivingEntity victim, DamageSource source, float baseDamage, float damageTaken, boolean blocked) {
-		if (ModDamage.isOurs(source) || !(victim.level() instanceof ServerLevel level)) {
+		if (!(victim.level() instanceof ServerLevel level)) {
 			return;
 		}
 
 		MinecraftServer server = level.getServer();
 		long now = NeonRelics.now(server);
+
+		// Remember any damage a Chrome Body deals to a player, by any means (shotgun, slam, crush, melee, arrows...).
+		if (victim instanceof Player && source.getEntity() instanceof ServerPlayer chrome && chrome != victim
+				&& NeonRelics.data(chrome).hasChrome()) {
+			CHROME_HITS.computeIfAbsent(victim.getUUID(), u -> new HashMap<>()).put(chrome.getUUID(), now);
+		}
+
+		if (ModDamage.isOurs(source)) {
+			return;
+		}
 
 		// ---- The attacker's side ----
 		if (source.getEntity() instanceof ServerPlayer attacker && attacker != victim && !blocked) {
@@ -349,6 +362,25 @@ public final class RelicCombat {
 
 		Slash slash = SLASHED.remove(victim.getUUID());
 		HELLFIRE.remove(victim.getUUID());
+		Map<UUID, Long> chromeHits = CHROME_HITS.remove(victim.getUUID());
+
+		// Every player kill resets a Chrome Body's timer - the killing blow or any hit in the last 15 seconds.
+		if (victim instanceof Player) {
+			if (killer != null && killer != victim && NeonRelics.data(killer).hasChrome()) {
+				resetChrome(killer, now);
+			}
+
+			if (chromeHits != null) {
+				for (Map.Entry<UUID, Long> hit : chromeHits.entrySet()) {
+					ServerPlayer chrome = server.getPlayerList().getPlayer(hit.getKey());
+
+					if (chrome != null && chrome != killer && chrome != victim && now - hit.getValue() <= Tuning.CHROME_KILL_ASSIST
+							&& NeonRelics.data(chrome).hasChrome()) {
+						resetChrome(chrome, now);
+					}
+				}
+			}
+		}
 
 		if (killer == null || killer == victim) {
 			return;
@@ -394,14 +426,19 @@ public final class RelicCombat {
 			case CYBER -> {
 				boolean hostile = victim instanceof Mob mob && mob.getType().getCategory() == MobCategory.MONSTER;
 
-				if (data.hasChrome() && (playerKill || hostile)) {
-					data.maniacUntil = now + Tuning.CHROME_TIMER;
-					PlayerState.of(killer.getUUID()).lastTimerWarning = -1L;
-					Fx.actionBar(killer, Component.literal("NOVA: Kill confirmed. Chrome stabilized - 60:00").withStyle(ChatFormatting.AQUA));
+				if (data.hasChrome() && hostile) {
+					resetChrome(killer, now);
 				}
 			}
 			default -> { }
 		}
+	}
+
+	private static void resetChrome(ServerPlayer player, long now) {
+		RelicData data = NeonRelics.data(player);
+		data.maniacUntil = now + Tuning.CHROME_TIMER;
+		PlayerState.of(player.getUUID()).lastTimerWarning = -1L;
+		Fx.actionBar(player, Component.literal("NOVA: Kill confirmed. Chrome stabilized - " + Fx.time(Tuning.CHROME_TIMER)).withStyle(ChatFormatting.AQUA));
 	}
 
 	private static void addMastery(ServerPlayer player, RelicData data, Relic relic) {
@@ -476,6 +513,8 @@ public final class RelicCombat {
 
 		if (now % 200 == 0) {
 			SLASHED.values().removeIf(slash -> now - slash.tick() > Tuning.INFERNO_KILL_WINDOW);
+			CHROME_HITS.values().forEach(hits -> hits.values().removeIf(tick -> now - tick > Tuning.CHROME_KILL_ASSIST));
+			CHROME_HITS.values().removeIf(Map::isEmpty);
 		}
 	}
 }

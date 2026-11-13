@@ -72,6 +72,8 @@ public final class Tuning {
 	public static final int BOOT_MANIAC_DURATION = 3 * MINUTE;
 	// Chrome Body
 	public static final int CHROME_TIMER = 60 * MINUTE;
+	/** A player who dies within this long after a Chrome Body hurt them counts as that Chrome Body's kill. */
+	public static final int CHROME_KILL_ASSIST = 15 * SECOND;
 	// Chrome Body ground slam
 	public static final double SLAM_MIN_FALL = 5.0;      // blocks
 	public static final float SLAM_BASE_DAMAGE = 5.0F;   // at 5 blocks
