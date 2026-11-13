@@ -110,7 +110,7 @@ public final class RelicHud {
 		if (relic.masteryGoal > 0) {
 			line2 = s.mastered() ? "Mastered" : "Mastery " + s.mastery() + "/" + s.masteryGoal();
 			line2Color = s.mastered() ? 0xFFFFAA00 : 0xFFAAAAAA;
-		} else if (relic == Relic.CYBER && live(s.passiveCooldown()) > 0) {
+		} else if ((relic == Relic.CYBER || relic == Relic.BEAST) && live(s.passiveCooldown()) > 0) {
 			line2 = "Passive: " + time(live(s.passiveCooldown()));
 		} else if (relic == Relic.CYBER && s.implant().equals(RelicData.IMPLANT_BOOT)) {
 			line2 = "Boot Accelerator";

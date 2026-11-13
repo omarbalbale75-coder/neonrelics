@@ -202,7 +202,7 @@ public final class RelicCombat {
 							Fx.particles(level, ParticleTypes.FLAME, victim, 12, 0.3, 0.02);
 						}
 					}
-					case BEAST -> onBeastHit(level, attacker, victim, source, state, now);
+					case BEAST -> onBeastHit(level, attacker, data, victim, source, state, now);
 					case CYBER -> onCyberHit(level, attacker, data, state, victim, now);
 					case WEATHER -> {
 						if (level.isThundering() && isTridentHit(source, attacker) && now - state.lastChannelTick >= Tuning.WEATHER_CHANNELING_COOLDOWN) {
@@ -225,7 +225,7 @@ public final class RelicCombat {
 		}
 	}
 
-	private static void onBeastHit(ServerLevel level, ServerPlayer attacker, LivingEntity victim, DamageSource source, PlayerState state, long now) {
+	private static void onBeastHit(ServerLevel level, ServerPlayer attacker, RelicData data, LivingEntity victim, DamageSource source, PlayerState state, long now) {
 		if (source.getDirectEntity() != attacker) {
 			return;
 		}
@@ -239,7 +239,12 @@ public final class RelicCombat {
 			Fx.sound(level, victim, SoundEvents.PLAYER_ATTACK_CRIT, 1.0F, 0.6F);
 		}
 
-		if (isAxe(attacker.getMainHandItem())) {
+		if (isAxe(attacker.getMainHandItem()) && !state.clawReady && !state.teleportReady) {
+			if (now < data.passiveUntil) {
+				Fx.actionBar(attacker, Component.literal("Beast passive recharging: " + Fx.time(data.passiveUntil - now)).withStyle(ChatFormatting.DARK_RED));
+				return;
+			}
+
 			if (now - state.lastAxeHit > Tuning.BEAST_AXE_WINDOW) {
 				state.axeHits = 0;
 			}
@@ -252,6 +257,7 @@ public final class RelicCombat {
 				state.clawReady = true;
 				state.teleportReady = true;
 				state.primedTick = now;
+				data.passiveUntil = now + Tuning.BEAST_PASSIVE_COOLDOWN;
 				Fx.sound(level, attacker, SoundEvents.RAVAGER_ROAR, 0.5F, 1.8F);
 				Fx.actionBar(attacker, Component.literal("CLAW + TELEPORT READY - next hit claws, right-click the axe to teleport").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
 			} else {

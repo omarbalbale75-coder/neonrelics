@@ -51,6 +51,8 @@ public final class Tuning {
 	public static final int BEAST_AXE_HITS = 3;
 	/** Max gap between axe hits before the charge resets. */
 	public static final int BEAST_AXE_WINDOW = 5 * SECOND;
+	/** After a charge completes, axe hits don't build a new one for this long. */
+	public static final int BEAST_PASSIVE_COOLDOWN = 13 * SECOND;
 	public static final double BEAST_TELEPORT_TARGET_RANGE = 24.0;
 	public static final double BEAST_TELEPORT_DISTANCE = 6.0;
 

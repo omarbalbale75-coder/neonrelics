@@ -29,7 +29,7 @@ public enum Relic {
 			List.of(
 					"Passive: every 3 axe hits, your next hit is a Claw (3.5 true damage)",
 					"and right-clicking the axe teleports you straight to the enemy you're",
-					"looking at - or 6 blocks forward if you're looking at nothing.",
+					"looking at - or 6 blocks forward if you're looking at nothing (13s cooldown).",
 					"Ability: a bite that stuns and deals 6 true damage (3 min cooldown).")),
 	CYBER("cyber", "Cyber", 0x3CF6FF, ChatFormatting.DARK_AQUA, "Implant", Tuning.BOOT_COOLDOWN, 0,
 			List.of(
