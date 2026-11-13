@@ -454,7 +454,7 @@ public final class RelicEvents {
 
 		if (serverPlayer.getRandom().nextDouble() < Tuning.PROSPERITY_DOUBLE_TRADE_CHANCE) {
 			PlayerState.of(serverPlayer.getUUID()).pendingRewards.add(offer.getResult().copy());
-			Fx.actionBar(serverPlayer, Component.literal("Prosperity doubled your trade!").withStyle(ChatFormatting.YELLOW));
+			Fx.actionBar(serverPlayer, Component.literal("Prosperity: double trade!").withStyle(ChatFormatting.YELLOW));
 			Fx.particles((ServerLevel) serverPlayer.level(), ParticleTypes.HAPPY_VILLAGER, serverPlayer, 12, 0.5, 0.1);
 		}
 	}

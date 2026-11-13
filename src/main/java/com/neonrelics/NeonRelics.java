@@ -17,6 +17,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
@@ -65,6 +66,7 @@ public class NeonRelics implements ModInitializer {
 		ServerLivingEntityEvents.ALLOW_DAMAGE.register(RelicCombat::allowDamage);
 		ServerLivingEntityEvents.AFTER_DAMAGE.register(RelicCombat::afterDamage);
 		ServerLivingEntityEvents.AFTER_DEATH.register(RelicCombat::afterDeath);
+		LootTableEvents.MODIFY_DROPS.register(RelicCombat::modifyDrops);
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, buildContext, selection) -> RelicCommands.register(dispatcher));
 

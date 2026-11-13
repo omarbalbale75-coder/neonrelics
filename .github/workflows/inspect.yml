@@ -14,9 +14,9 @@ jobs:
       - run: chmod +x ./gradlew && ./gradlew genSources --no-configuration-cache -q || true
       - name: dump
         run: |
-          JAR=$(find ~/.gradle .gradle -name "*minecraft*sources*.jar" 2>/dev/null | head -1)
-          echo "JAR=$JAR"
-          mkdir -p /tmp/src && cd /tmp/src && unzip -q -o "$JAR"
+          mkdir -p /tmp/src
+          for JAR in $(find ~/.gradle .gradle -name "*minecraft*sources*.jar" 2>/dev/null); do echo "JAR=$JAR"; (cd /tmp/src && unzip -q -o "$JAR"); done
+          cd /tmp/src
           for f in $(find . -name Villager.java -o -name AbstractVillager.java -o -name MerchantOffer.java -o -name MerchantMenu.java -o -name MerchantResultSlot.java); do
             echo "=================== $f"; cat -n "$f" | grep -nE "SpecialPrice|startTrading|stopTrading|mobInteract|openTradingScreen|getCostA|notifyTrade|resetSpecial|updateSpecial|Discount|priceMultiplier|getModifiedCostCount|class |sendMerchantOffers" 
           done

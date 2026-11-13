@@ -15,9 +15,10 @@ public enum Relic {
 					"burn doubles and Fire Resistance no longer protects them.")),
 	PROSPERITY("prosperity", "Prosperity", 0xFFD43B, ChatFormatting.YELLOW, null, 0, 0,
 			List.of(
-					"Passive: villager trades cost half, 25% chance to get double.",
-					"Passive: evokers you kill drop 2 totems. Winning a raid has a",
-					"10% chance to grant Hero of the Village V.",
+					"Passive: villager trades cost half and always pay out double.",
+					"Passive: mobs you kill drop 2x loot (10% chance of 5x) -",
+					"evokers drop 2+ totems. Winning a raid has a 10% chance",
+					"to grant Hero of the Village V.",
 					"No ability, no mastery - pure progression.")),
 	WEATHER("weather", "Weather", 0x38C9FF, ChatFormatting.AQUA, "Stormcall", Tuning.WEATHER_COOLDOWN, Tuning.WEATHER_MASTERY_STORMS,
 			List.of(

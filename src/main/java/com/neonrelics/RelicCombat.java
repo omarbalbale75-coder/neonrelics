@@ -1,13 +1,16 @@
 package com.neonrelics;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -32,6 +35,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.EntityHitResult;
 
 /**
@@ -366,13 +372,6 @@ public final class RelicCombat {
 					addMastery(killer, data, Relic.WEATHER);
 				}
 			}
-			case PROSPERITY -> {
-				if (victim.getType() == EntityTypes.EVOKER) {
-					ItemStack totems = new ItemStack(Items.TOTEM_OF_UNDYING, Tuning.PROSPERITY_EXTRA_TOTEMS);
-					level.addFreshEntity(new ItemEntity(level, victim.getX(), victim.getY() + 0.5, victim.getZ(), totems));
-					Fx.particles(level, ParticleTypes.TOTEM_OF_UNDYING, victim, 30, 0.5, 0.3);
-				}
-			}
 			case CYBER -> {
 				boolean hostile = victim instanceof Mob mob && mob.getType().getCategory() == MobCategory.MONSTER;
 
@@ -402,6 +401,52 @@ public final class RelicCombat {
 		} else {
 			player.sendSystemMessage(Component.literal("Mastery progress: " + data.mastery + "/" + relic.masteryGoal).withStyle(relic.format));
 			Fx.sound(level, player, SoundEvents.PLAYER_LEVELUP, 0.8F, 1.5F);
+		}
+	}
+
+	// ------------------------------------------------------------------
+	// Prosperity: multiplied mob drops
+	// ------------------------------------------------------------------
+
+	/** Fabric loot event: runs whenever a loot table rolls. Only touches mobs killed by a Prosperity player. */
+	public static void modifyDrops(Holder<LootTable> table, LootContext context, List<ItemStack> drops) {
+		if (drops.isEmpty() || !context.hasParameter(LootContextParams.THIS_ENTITY) || !context.hasParameter(LootContextParams.DAMAGE_SOURCE)) {
+			return;
+		}
+
+		if (!(context.getOptional(LootContextParams.THIS_ENTITY) instanceof LivingEntity victim) || victim instanceof Player || !victim.isDeadOrDying()) {
+			return;
+		}
+
+		DamageSource source = context.getOptional(LootContextParams.DAMAGE_SOURCE);
+		ServerPlayer killer = null;
+
+		if (source != null && source.getEntity() instanceof ServerPlayer p) {
+			killer = p;
+		} else if (victim.getKillCredit() instanceof ServerPlayer p) {
+			killer = p;
+		}
+
+		if (killer == null || !NeonRelics.data(killer).is(Relic.PROSPERITY)) {
+			return;
+		}
+
+		boolean jackpot = killer.getRandom().nextDouble() < Tuning.PROSPERITY_JACKPOT_CHANCE;
+		int multiplier = jackpot ? Tuning.PROSPERITY_JACKPOT_MULTIPLIER : Tuning.PROSPERITY_DROP_MULTIPLIER;
+		List<ItemStack> extra = new ArrayList<>();
+
+		for (ItemStack stack : drops) {
+			for (int i = 1; i < multiplier; i++) {
+				extra.add(stack.copy());
+			}
+		}
+
+		drops.addAll(extra);
+
+		if (jackpot && victim.level() instanceof ServerLevel level) {
+			Fx.particles(level, ParticleTypes.TOTEM_OF_UNDYING, victim, 40, 0.5, 0.4);
+			Fx.sound(level, victim, SoundEvents.PLAYER_LEVELUP, 1.0F, 1.6F);
+			Fx.actionBar(killer, Component.literal("JACKPOT! x" + multiplier + " drops").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
 		}
 	}
 

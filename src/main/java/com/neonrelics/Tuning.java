@@ -25,8 +25,13 @@ public final class Tuning {
 	public static final int INFERNO_KILL_WINDOW = 10 * SECOND;
 
 	// ---------- Prosperity ----------
-	public static final double PROSPERITY_DOUBLE_TRADE_CHANCE = 0.25;
-	public static final int PROSPERITY_EXTRA_TOTEMS = 1; // vanilla drops 1, so evokers drop 2 total
+	/** Chance that a villager trade pays out twice. 1.0 = every trade. */
+	public static final double PROSPERITY_DOUBLE_TRADE_CHANCE = 1.0;
+	/** Mob loot multiplier for mobs you kill (evokers drop 2 totems). */
+	public static final int PROSPERITY_DROP_MULTIPLIER = 2;
+	/** Chance a kill hits the jackpot instead. */
+	public static final double PROSPERITY_JACKPOT_CHANCE = 0.10;
+	public static final int PROSPERITY_JACKPOT_MULTIPLIER = 5;
 	public static final double PROSPERITY_HERO_V_CHANCE = 0.10;
 
 	// ---------- Weather ----------
