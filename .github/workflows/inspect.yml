@@ -1,0 +1,27 @@
+name: inspect
+on:
+  push:
+    branches: [inspect-sources]
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+      - run: chmod +x ./gradlew && ./gradlew genSources --no-configuration-cache -q || true
+      - name: dump
+        run: |
+          JAR=$(find ~/.gradle .gradle -name "*minecraft*sources*.jar" 2>/dev/null | head -1)
+          echo "JAR=$JAR"
+          mkdir -p /tmp/src && cd /tmp/src && unzip -q -o "$JAR"
+          for f in $(find . -name Villager.java -o -name AbstractVillager.java -o -name MerchantOffer.java -o -name MerchantMenu.java -o -name MerchantResultSlot.java); do
+            echo "=================== $f"; cat -n "$f" | grep -nE "SpecialPrice|startTrading|stopTrading|mobInteract|openTradingScreen|getCostA|notifyTrade|resetSpecial|updateSpecial|Discount|priceMultiplier|getModifiedCostCount|class |sendMerchantOffers" 
+          done
+          echo "=================== Villager full startTrading/updateSpecialPrices bodies"
+          V=$(find . -name Villager.java | head -1)
+          awk '/void startTrading|void updateSpecialPrices|void stopTrading|void resetSpecialPrices|InteractionResult mobInteract/{p=1;n=0} p{print; if(/\{/)n+=gsub(/\{/,"{"); if(/\}/)n-=gsub(/\}/,"}"); if(n<=0 && /\}/){p=0;print "-----"}}' "$V"
+          M=$(find . -name MerchantOffer.java | head -1)
+          awk '/getCostA\(\)|getModifiedCostCount|addToSpecialPriceDiff|resetSpecialPriceDiff/{p=1;n=0} p{print; if(/\{/)n+=gsub(/\{/,"{"); if(/\}/)n-=gsub(/\}/,"}"); if(n<=0 && /\}/){p=0;print "-----"}}' "$M"
