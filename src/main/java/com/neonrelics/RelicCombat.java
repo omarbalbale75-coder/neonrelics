@@ -130,11 +130,6 @@ public final class RelicCombat {
 					amount *= Tuning.HASTE_DAMAGE_MULTIPLIER;
 				}
 			}
-			case CYBER -> {
-				if (melee && data.hasChrome() && player.getMainHandItem().is(Items.MACE)) {
-					amount *= 2.0F;
-				}
-			}
 			default -> { }
 		}
 

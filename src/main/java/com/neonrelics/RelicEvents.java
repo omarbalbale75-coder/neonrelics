@@ -122,6 +122,7 @@ public final class RelicEvents {
 
 		if (data.hasChrome()) {
 			Fx.keepPermanent(player, MobEffects.RESISTANCE, 1);
+			RelicAbilities.trackSlam(player, state);
 		}
 	}
 

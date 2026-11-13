@@ -72,6 +72,11 @@ public final class Tuning {
 	public static final int BOOT_MANIAC_DURATION = 3 * MINUTE;
 	// Chrome Body
 	public static final int CHROME_TIMER = 60 * MINUTE;
+	// Chrome Body ground slam
+	public static final double SLAM_MIN_FALL = 5.0;      // blocks
+	public static final float SLAM_BASE_DAMAGE = 5.0F;   // at 5 blocks
+	public static final float SLAM_DAMAGE_PER_BLOCK = 1.5F;
+	public static final double SLAM_RADIUS = 4.0;
 	// Chrome Body shotgun
 	public static final float SHOTGUN_TRUE_DAMAGE = 3.0F;
 	public static final double SHOTGUN_RANGE = 12.0;

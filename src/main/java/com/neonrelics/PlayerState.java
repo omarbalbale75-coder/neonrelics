@@ -50,6 +50,9 @@ public final class PlayerState {
 
 	// Chrome Body shotgun
 	public long shotgunReadyAt;
+	// Chrome Body ground slam: highest point since leaving the ground
+	public double airPeakY = Double.NaN;
+	public boolean slamInvalid;
 
 	// Prosperity
 	public boolean heroSeen;

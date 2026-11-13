@@ -483,7 +483,7 @@ public final class RelicAbilities {
 			Fx.keepPermanent(player, MobEffects.RESISTANCE, 1);
 			startManiac(player, data, now, Tuning.CHROME_TIMER);
 			shotgunUpkeep(player, data);
-			Nova.say(player, "Chrome Body online. Resistance II, double mace damage, zero fall damage.");
+			Nova.say(player, "Chrome Body online. Resistance II, zero fall damage, and every big drop is a ground slam.");
 			Nova.say(player, "Shotgun linked to your chrome. Lose it and I'll print you another.");
 			Nova.warn(player, "You now run permanently at 200% Cyber Maniac. You burn out in 1 hour - every kill resets the clock.");
 		} else {
@@ -611,6 +611,75 @@ public final class RelicAbilities {
 		// Recoil
 		player.setDeltaMovement(player.getDeltaMovement().subtract(look.scale(0.35)));
 		player.syncVelocity = true;
+	}
+
+	/**
+	 * Chrome Body ground slam: falling 5+ blocks onto the ground hits everyone within 4 blocks
+	 * like a mace smash - 5 damage at 5 blocks, +1.5 per extra block - with a wind burst that
+	 * throws them outward. You are not bounced back up.
+	 */
+	public static void trackSlam(ServerPlayer player, PlayerState state) {
+		if (player.isInWater() || player.isFallFlying() || player.isPassenger() || player.getAbilities().flying) {
+			state.slamInvalid = true;
+		}
+
+		if (!player.onGround()) {
+			state.airPeakY = Double.isNaN(state.airPeakY) ? player.getY() : Math.max(state.airPeakY, player.getY());
+			return;
+		}
+
+		double drop = Double.isNaN(state.airPeakY) ? 0.0 : state.airPeakY - player.getY();
+		boolean valid = !state.slamInvalid;
+		state.airPeakY = Double.NaN;
+		state.slamInvalid = false;
+
+		if (valid && drop >= Tuning.SLAM_MIN_FALL) {
+			groundSlam(player, drop);
+		}
+	}
+
+	private static void groundSlam(ServerPlayer player, double drop) {
+		ServerLevel level = (ServerLevel) player.level();
+		float damage = Tuning.SLAM_BASE_DAMAGE + Tuning.SLAM_DAMAGE_PER_BLOCK * (float) (drop - Tuning.SLAM_MIN_FALL);
+		double radius = Tuning.SLAM_RADIUS;
+		AABB area = player.getBoundingBox().inflate(radius, 2.0, radius);
+		int hits = 0;
+
+		for (Entity entity : level.getEntities(player, area, e -> validTarget(player, e))) {
+			double dx = entity.getX() - player.getX();
+			double dz = entity.getZ() - player.getZ();
+			double dist = Math.sqrt(dx * dx + dz * dz);
+
+			if (dist > radius) {
+				continue;
+			}
+
+			LivingEntity target = (LivingEntity) entity;
+			target.hurtServer(level, player.damageSources().playerAttack(player), damage);
+
+			// Wind burst: throw them outward and up.
+			Vec3 away = dist < 1.0E-3 ? new Vec3(0.0, 0.0, 0.0) : new Vec3(dx / dist, 0.0, dz / dist);
+			double strength = 1.4 * (1.0 - dist / (radius + 1.0)) + 0.4;
+			target.setDeltaMovement(target.getDeltaMovement().add(away.x * strength, 0.6, away.z * strength));
+			target.syncVelocity = true;
+			hits++;
+		}
+
+		// Shockwave visuals
+		level.sendParticles(ParticleTypes.GUST_EMITTER_LARGE, player.getX(), player.getY() + 0.5, player.getZ(), 1, 0.0, 0.0, 0.0, 0.0);
+
+		for (int i = 0; i < 32; i++) {
+			double angle = i * Math.PI * 2.0 / 32.0;
+			double x = player.getX() + Math.cos(angle) * radius;
+			double z = player.getZ() + Math.sin(angle) * radius;
+			level.sendParticles(ParticleTypes.GUST, x, player.getY() + 0.3, z, 1, 0.0, 0.0, 0.0, 0.0);
+			level.sendParticles(Fx.dust(0xFF55FF, 1.2F), player.getX() + Math.cos(angle) * radius * 0.5, player.getY() + 0.2,
+					player.getZ() + Math.sin(angle) * radius * 0.5, 1, 0.0, 0.0, 0.0, 0.0);
+		}
+
+		Fx.sound(level, player, SoundEvents.MACE_SMASH_GROUND_HEAVY, 1.2F, 0.8F);
+		Fx.sound(level, player, SoundEvents.WIND_CHARGE_BURST, 1.0F, 0.7F);
+		Fx.actionBar(player, Component.literal(String.format("CHROME SLAM  %.1f dmg  (%d hit)", damage, hits)).withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.BOLD));
 	}
 
 	/**

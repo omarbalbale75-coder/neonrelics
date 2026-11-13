@@ -38,7 +38,8 @@ public final class Nova {
 						+ "Every use raises your Neural Load bar. Hit 100% and you go Cyber Maniac:\n"
 						+ "massively enhanced for 3 minutes... then you die.");
 		MutableComponent chrome = button("[Chrome Body]", ChatFormatting.LIGHT_PURPLE, "/relic implant " + RelicData.IMPLANT_CHROME,
-				"Passives: permanent Resistance II, double mace damage, no fall damage,\n"
+				"Passives: permanent Resistance II, no fall damage, a ground slam when you\n"
+						+ "land from 5+ blocks (5 dmg, +1.5 per block, 4 block radius),\n"
 						+ "plus the Chrome Breaker shotgun (3 true damage per blast, always yours).\n"
 						+ "You are permanently at 200% Cyber Maniac. You die after 1 hour\n"
 						+ "unless you keep killing - every kill resets the timer.");
