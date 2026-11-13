@@ -41,7 +41,7 @@ If you push this folder to GitHub, the included workflow (`.github/workflows/bui
 
 **Cyber.** Hit the same target 3 times in a row and it gets Slowness III for 3s. Get hit 3 times in a row and your attackers get Slowness V and Mining Fatigue V for 5s, while you get Speed III for 5s. These share a 1 min cooldown. Your AI, **NOVA**, sells one permanent implant for 10 diamonds:
 - **Boot Accelerator.** Ability: Overdrive. For 8s, everything within 20 blocks is slowed and projectiles freeze, while you get Speed III and leave neon afterimages (20s cooldown). Each use adds 30% to the Neural Load bar on the right of your screen, and it drains slowly. At 100% you go **Cyber Maniac**: heavily buffed for 3 minutes, then you die.
-- **Chrome Body.** No ability. You get permanent Resistance II, double mace damage, no fall damage, and permanent Cyber Maniac at level II (200%). You die after 1 hour unless you keep killing; any player or hostile-mob kill resets the clock. You also always carry the **Chrome Breaker** shotgun: right-click to blast everything in a cone in front of you (12 blocks) for 3 true damage. It has Curse of Vanishing, and you get a new one whenever you don't have one, including after respawning. Nobody else can use it.
+- **Chrome Body.** No ability. You get permanent Resistance II, double mace damage, no fall damage, and permanent Cyber Maniac at level II (200%). You die after 1 hour unless you keep killing; any player or hostile-mob kill resets the clock. You also always carry the **Chrome Breaker** shotgun: right-click to blast everything in a cone in front of you (12 blocks) for 3 true damage, once every 4 seconds. It has Curse of Vanishing, and you get a new one whenever you don't have one, including after respawning. Nobody else can use it.
 
 **Bloodlusted.** Every kill gives Strength IV for 30s. Swords deal 1.5x damage. Ability: Strength IV and Speed III for 1 minute (3 min cooldown).
 
@@ -50,6 +50,8 @@ If you push this folder to GitHub, the included workflow (`.github/workflows/bui
 ## Items & recipes
 - **Relic Reroll Tome:** right-click to swap your relic for a different random one. Every other relic has equal odds. It wipes mastery and implants. Recipe: totem of undying in the corners, netherite ingots on the edges, a beacon in the center.
 - **Cobwebs:** 2 string placed diagonally makes 2 cobwebs.
+- **Golden Apple:** an apple with a gold ingot on each side (top, bottom, left, right).
+- **Enchanted Golden Apple:** a golden apple in the center, diamond blocks to its left and right, gold blocks on the top and bottom rows.
 
 ## Tweaking
 Every number (cooldowns, durations, damage, implant price, chances) is in `src/main/java/com/neonrelics/Tuning.java`.

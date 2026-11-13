@@ -75,7 +75,7 @@ public final class Tuning {
 	public static final double SHOTGUN_RANGE = 12.0;
 	/** Half-angle of the blast cone in degrees. */
 	public static final double SHOTGUN_CONE = 22.0;
-	public static final int SHOTGUN_COOLDOWN = 25; // ticks
+	public static final int SHOTGUN_COOLDOWN = 4 * SECOND;
 
 	// ---------- Bloodlusted ----------
 	public static final int BLOOD_KILL_STRENGTH = 30 * SECOND;
