@@ -12,7 +12,7 @@ import com.neonrelics.RelicCombat;
 
 /**
  * Lets relics change incoming damage (Weather tridents, Bloodlusted swords,
- * Haste Overclock, Chrome Body maces) before armor and effects are applied.
+ * Haste Overclock) before armor and effects are applied.
  */
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {

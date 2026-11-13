@@ -122,7 +122,6 @@ public final class RelicEvents {
 
 		if (data.hasChrome()) {
 			Fx.keepPermanent(player, MobEffects.RESISTANCE, 1);
-			RelicAbilities.trackSlam(player, state);
 		}
 	}
 
@@ -259,6 +258,7 @@ public final class RelicEvents {
 
 		if (data.hasChrome()) {
 			Fx.keepPermanent(player, MobEffects.RESISTANCE, 1);
+			RelicAbilities.trackSlam(player, state);
 
 			if (data.maniacUntil == 0L) {
 				data.maniacUntil = now + Tuning.CHROME_TIMER;
