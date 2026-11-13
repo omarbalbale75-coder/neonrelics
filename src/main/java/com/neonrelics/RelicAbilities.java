@@ -539,7 +539,7 @@ public final class RelicAbilities {
 	// Chrome Body shotgun
 	// ------------------------------------------------------------------
 
-	public static void fireShotgun(ServerPlayer player) {
+	public static void fireShotgun(ServerPlayer player, ItemStack gun) {
 		RelicData data = NeonRelics.data(player);
 		ServerLevel level = (ServerLevel) player.level();
 
@@ -552,10 +552,15 @@ public final class RelicAbilities {
 		long now = NeonRelics.now(level.getServer());
 
 		if (now < state.shotgunReadyAt) {
+			int left = (int) (state.shotgunReadyAt - now);
+			player.getCooldowns().addCooldown(gun, left);
+			Fx.actionBar(player, Component.literal("Chrome Breaker recharging: " + Fx.time(left)).withStyle(ChatFormatting.LIGHT_PURPLE));
 			return;
 		}
 
 		state.shotgunReadyAt = now + Tuning.SHOTGUN_COOLDOWN;
+		// The same white sweep over the item you get after throwing an ender pearl.
+		player.getCooldowns().addCooldown(gun, Tuning.SHOTGUN_COOLDOWN);
 		Vec3 eye = player.getEyePosition();
 		Vec3 look = player.getLookAngle();
 		double minDot = Math.cos(Math.toRadians(Tuning.SHOTGUN_CONE));

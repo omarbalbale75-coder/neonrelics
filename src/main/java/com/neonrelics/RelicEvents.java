@@ -165,6 +165,18 @@ public final class RelicEvents {
 			RelicAbilities.shotgunUpkeep(player, data);
 		}
 
+		// Chrome Breaker countdown on the action bar while you hold it.
+		if (now % 10 == 0 && data.hasChrome() && (player.getMainHandItem().is(com.neonrelics.item.ModItems.CHROME_SHOTGUN)
+				|| player.getOffhandItem().is(com.neonrelics.item.ModItems.CHROME_SHOTGUN))) {
+			long left = state.shotgunReadyAt - now;
+
+			if (left > 0) {
+				Fx.actionBar(player, Component.literal("Chrome Breaker recharging: " + Fx.time(left)).withStyle(ChatFormatting.LIGHT_PURPLE));
+			} else if (left > -10) {
+				Fx.actionBar(player, Component.literal("Chrome Breaker READY").withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.BOLD));
+			}
+		}
+
 		if (relic == null || !player.isAlive()) {
 			return;
 		}

@@ -32,7 +32,7 @@ public class ChromeShotgunItem extends Item {
 		}
 
 		if (player instanceof ServerPlayer serverPlayer) {
-			RelicAbilities.fireShotgun(serverPlayer);
+			RelicAbilities.fireShotgun(serverPlayer, player.getItemInHand(hand));
 		}
 
 		return InteractionResult.SUCCESS;
