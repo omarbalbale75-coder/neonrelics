@@ -33,7 +33,7 @@ If you push this folder to GitHub, the included workflow (`.github/workflows/bui
 ## Relics
 **Inferno.** Passive: critical hits burn for 2 seconds (2 fire-damage ticks). The burn never stacks, it only refreshes. Ability: a 5-block-wide fire slash that deals 3 true damage and burns for 4 seconds (40s cooldown). Mastery: kill 3 players within 10s of slashing them. After mastery the slash deals 4 true damage, every burn lasts twice as long, and Fire Resistance no longer protects targets.
 
-**Prosperity.** Villager trades cost half, and each trade has a 25% chance of paying out double. Evokers you kill drop 2 totems. Winning a raid has a 10% chance to upgrade your Hero of the Village to V. No ability, no mastery.
+**Prosperity.** Villager trades cost half and always pay out double. Mobs you kill drop 2x loot, with a 10% chance of 5x (so evokers drop 2 or 5 totems). Winning a raid has a 10% chance to upgrade your Hero of the Village to V. No ability, no mastery.
 
 **Weather.** In rain, tridents deal +20% and count as Sharpness III. In thunderstorms they deal +35%, count as Sharpness V, and strike Channeling lightning on every hit, thrown or melee. The lightning only hits the target, not you. Ability: set the weather to clear, rain or thunder for 5 minutes (30 min cooldown). Mastery: summon 3 thunderstorms and kill at least one player during each; the cooldown then drops to 20 minutes.
 

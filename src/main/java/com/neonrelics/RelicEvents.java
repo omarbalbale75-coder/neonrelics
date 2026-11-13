@@ -27,6 +27,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.Merchant;
 import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 
@@ -139,7 +140,6 @@ public final class RelicEvents {
 	public static void onServerTick(MinecraftServer server) {
 		long now = NeonRelics.now(server);
 		RelicCombat.tick(server, now);
-		tickDiscounts(now);
 
 		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 			tickPlayer(server, player, now);
@@ -376,72 +376,22 @@ public final class RelicEvents {
 	// Prosperity: half-price villager trades
 	// ------------------------------------------------------------------
 
-	private static final Map<UUID, Discount> DISCOUNTS = new HashMap<>();
-
-	private static final class Discount {
-		final Merchant merchant;
-		final Entity entity;
-		final List<MerchantOffer> offers = new ArrayList<>();
-		final List<Integer> amounts = new ArrayList<>();
-		final long started;
-		boolean seenTrading;
-
-		Discount(Merchant merchant, Entity entity, long started) {
-			this.merchant = merchant;
-			this.entity = entity;
-			this.started = started;
+	/**
+	 * Called by VillagerMixin right after a villager works out its prices for a player
+	 * (reputation, Hero of the Village...) and before the trade screen gets them.
+	 * Vanilla resets these prices every time trading starts and stops, so this never stacks.
+	 */
+	public static void applyProsperityDiscount(Player player, MerchantOffers offers) {
+		if (!(player instanceof ServerPlayer serverPlayer) || !NeonRelics.data(serverPlayer).is(Relic.PROSPERITY)) {
+			return;
 		}
 
-		void revert() {
-			for (int i = 0; i < this.offers.size(); i++) {
-				this.offers.get(i).addToSpecialPriceDiff(this.amounts.get(i));
-			}
-		}
-	}
-
-	public static InteractionResult onUseEntity(Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hit) {
-		if (level.isClientSide() || !(player instanceof ServerPlayer serverPlayer) || entity.getType() != EntityTypes.VILLAGER
-				|| !(entity instanceof Merchant merchant) || !NeonRelics.data(serverPlayer).is(Relic.PROSPERITY)) {
-			return InteractionResult.PASS;
-		}
-
-		if (merchant.getTradingPlayer() != null || DISCOUNTS.containsKey(entity.getUUID()) || merchant.getOffers().isEmpty()) {
-			return InteractionResult.PASS;
-		}
-
-		// Discount every offer by half. Vanilla villagers wipe special prices when trading stops.
-		Discount discount = new Discount(merchant, entity, NeonRelics.now(serverPlayer.level().getServer()));
-
-		for (MerchantOffer offer : merchant.getOffers()) {
+		for (MerchantOffer offer : offers) {
 			int cost = offer.getCostA().getCount();
-			int cut = cost / 2;
+			int halved = Math.max(1, cost / 2);
 
-			if (cut > 0) {
-				offer.addToSpecialPriceDiff(-cut);
-				discount.offers.add(offer);
-				discount.amounts.add(cut);
-			}
-		}
-
-		DISCOUNTS.put(entity.getUUID(), discount);
-		return InteractionResult.PASS;
-	}
-
-	private static void tickDiscounts(long now) {
-		Iterator<Discount> it = DISCOUNTS.values().iterator();
-
-		while (it.hasNext()) {
-			Discount discount = it.next();
-
-			if (discount.entity.isRemoved()) {
-				it.remove();
-			} else if (discount.merchant.getTradingPlayer() != null) {
-				discount.seenTrading = true;
-			} else if (discount.seenTrading) {
-				it.remove(); // trading finished - the villager already reset its prices
-			} else if (now - discount.started > 10) {
-				discount.revert(); // the trade screen never opened
-				it.remove();
+			if (halved < cost) {
+				offer.addToSpecialPriceDiff(halved - cost);
 			}
 		}
 	}

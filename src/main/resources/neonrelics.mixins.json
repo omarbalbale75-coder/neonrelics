@@ -5,7 +5,8 @@
 	"mixins": [
 		"LivingEntityMixin",
 		"MerchantResultSlotMixin",
-		"ServerGamePacketListenerImplMixin"
+		"ServerGamePacketListenerImplMixin",
+		"VillagerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
