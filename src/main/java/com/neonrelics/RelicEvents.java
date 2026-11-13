@@ -187,13 +187,6 @@ public final class RelicEvents {
 					}
 				}
 			}
-			case BEAST -> {
-				// A fresh swing with a spear after a spear hit = the empowered lunge.
-				if (state.lungeReady && now > state.primedTick && RelicCombat.isSpear(player.getMainHandItem())
-						&& player.swinging && player.swingTime <= 0) {
-					RelicAbilities.beastLunge(player, state);
-				}
-			}
 			case CYBER -> tickCyber(player, data, state, level, now);
 			case INFERNO -> {
 				if (data.mastered && now % 10 == 0) {
@@ -343,6 +336,23 @@ public final class RelicEvents {
 
 	private static int ticksLeft(long until, long now) {
 		return (int) Math.max(0L, Math.min(Integer.MAX_VALUE, until - now));
+	}
+
+	// ------------------------------------------------------------------
+	// Beast: a fresh spear swing (left click) after a spear hit = the empowered lunge
+	// ------------------------------------------------------------------
+
+	/** Called by ServerGamePacketListenerImplMixin when the player swings (left-clicks). */
+	public static void onPunch(ServerPlayer player) {
+		if (!NeonRelics.data(player).is(Relic.BEAST) || !RelicCombat.isSpear(player.getMainHandItem())) {
+			return;
+		}
+
+		PlayerState state = PlayerState.of(player.getUUID());
+
+		if (state.lungeReady && NeonRelics.now(player.level().getServer()) > state.primedTick) {
+			RelicAbilities.beastLunge(player, state);
+		}
 	}
 
 	// ------------------------------------------------------------------

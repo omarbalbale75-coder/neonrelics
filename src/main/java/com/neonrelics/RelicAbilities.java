@@ -271,7 +271,7 @@ public final class RelicAbilities {
 			Fx.effect(target, MobEffects.WEAKNESS, Tuning.BEAST_BITE_STUN, 9);
 			Fx.effect(target, MobEffects.MINING_FATIGUE, Tuning.BEAST_BITE_STUN, 4);
 			target.setDeltaMovement(0.0, Math.min(0.0, target.getDeltaMovement().y), 0.0);
-			target.hurtMarked = true;
+			target.syncVelocity = true;
 		}
 
 		Fx.particles(level, ParticleTypes.DAMAGE_INDICATOR, target, 15, 0.3, 0.2);
@@ -330,7 +330,7 @@ public final class RelicAbilities {
 			trail(level, start, dest);
 			teleport(player, dest, player.getYRot(), player.getXRot());
 			player.setDeltaMovement(dir.scale(0.5));
-			player.hurtMarked = true;
+			player.syncVelocity = true;
 			Fx.actionBar(player, Component.literal("LUNGE +6").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
 		}
 
@@ -513,7 +513,7 @@ public final class RelicAbilities {
 
 			if (projectile.getOwner() != player && state.slowedProjectiles.add(projectile.getUUID())) {
 				projectile.setDeltaMovement(projectile.getDeltaMovement().scale(0.2));
-				projectile.hurtMarked = true;
+				projectile.syncVelocity = true;
 			}
 		}
 
